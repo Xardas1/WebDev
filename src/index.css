@@ -1,0 +1,9 @@
+/* Pull in Tailwind (all layers) */
+@import "tailwindcss";
+
+/* Your global tweaks ------------------------- */
+@layer base {
+  body {
+    @apply text-white;
+  }
+}
