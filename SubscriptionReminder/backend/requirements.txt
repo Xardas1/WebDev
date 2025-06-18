@@ -3,4 +3,7 @@ uvicorn[standard]
 sqlalchemy
 python-dotenv
 psycopg2-binary
-pydantic[email]
+passlib[bcrypt]
+python-jose
+sendgrid
+email-validator
