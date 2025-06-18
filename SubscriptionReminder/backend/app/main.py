@@ -17,12 +17,12 @@ load_dotenv()
 app = FastAPI()
 
 origins = [
-    "https://remindrr.vercel.app/",
+    "https://remind-qq37wb2tm-john-f-kennedys-projects-e8f88eee.vercel.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
