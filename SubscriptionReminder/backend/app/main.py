@@ -17,7 +17,7 @@ load_dotenv()
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",
+    "https://remindrr.vercel.app/",
 ]
 
 app.add_middleware(
