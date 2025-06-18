@@ -17,7 +17,7 @@ load_dotenv()
 app = FastAPI()
 
 origins = [
-    "https://remind-9nwwq2rev-john-f-kennedys-projects-e8f88eee.vercel.app",
+    "https://remind.vercel.app",
 ]
 
 app.add_middleware(
