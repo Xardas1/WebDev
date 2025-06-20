@@ -9,7 +9,7 @@ let fieldsState = {};
 
 fields.forEach(field => fieldsState[field.name] = '');
 
-export default function Login() { 
+export default function Signup() { 
     const [loginState, setLoginState] = useState(fieldsState);
 
     const handleChange = (e) => {
