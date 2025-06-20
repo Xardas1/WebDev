@@ -40,8 +40,7 @@ export default function Login() {
             });
 
             // Use the context login method (if you use AuthContext)
-            localStorage.setItem('token', loginResponse.data.access_token);
-            window.location.href = "/home";
+
 
 
         } catch (error) {
