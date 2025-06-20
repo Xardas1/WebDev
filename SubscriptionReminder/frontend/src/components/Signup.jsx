@@ -3,6 +3,8 @@ import { signupFields } from "../constants/signupFields"
 import Input from "./Input";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
+import { Navigate, useNavigate } from 'react-router-dom';
+
 
 const fields = signupFields;
 let fieldsState = {};
@@ -11,7 +13,7 @@ fields.forEach(field => fieldsState[field.name] = '');
 
 export default function Signup() { 
     const [loginState, setLoginState] = useState(fieldsState);
-
+    const navigate = useNavigate()
     const handleChange = (e) => {
         setLoginState({ ...loginState, [e.target.name]: e.target.value});
     };
@@ -40,7 +42,8 @@ export default function Signup() {
             });
 
             // Use the context login method (if you use AuthContext)
-
+           
+            navigate("/home");
 
 
         } catch (error) {
