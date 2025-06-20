@@ -22,8 +22,9 @@ const App = () => {
 
   if (loading) return <p className="text-center text-white ">Loading...</p>;
 
-  const hideNavbarRoutes = ['/startup', '/register'];
+  const hideNavbarRoutes = ['/startup'];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+
 
   return (
         <>
