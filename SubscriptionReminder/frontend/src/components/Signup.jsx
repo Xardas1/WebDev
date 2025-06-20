@@ -42,7 +42,7 @@ export default function Signup() {
             });
 
             // Use the context login method (if you use AuthContext)
-           
+            console.log("Navigating to /home...")
             navigate("/home");
 
 
