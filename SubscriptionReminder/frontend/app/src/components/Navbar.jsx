@@ -60,7 +60,7 @@ const Navbar = () => {
               </a>
 
               <a
-                href="https://app-reminded.vercel.app/login"
+                href="https://app-reminded.vercel.app/signup"
                 className="font-semibold text-sm rounded-md px-4 py-2 bg-gray-900 text-white hover:bg-gray-700 transition cursor-pointer"
               >
                 Sign up
