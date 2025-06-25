@@ -6,19 +6,13 @@ import { CircleCheck } from 'lucide-react';
 import { Clover } from 'lucide-react';
 import { Rocket } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
 
   const ChangePage = (e) => {
     e.preventDefault();
-    if (token) {
-      navigate('/product');
-    } else { 
       navigate('/signup');
-    }
   };
 
 
