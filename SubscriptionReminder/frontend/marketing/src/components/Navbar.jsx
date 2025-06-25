@@ -6,19 +6,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
-    { to: '/home', label: 'Home' },
-    { to: '/product', label: 'Demo' },
+    { href: 'https://reminded.vercel.app/home', label: 'Home' },
+    { href: 'https://app-reminded.vercel.app/product', label: 'Demo'},
   ];
 
-  const ChangeSignUp = (e) => {
-    e.preventDefault();
-    navigate("/signup");
-  };
 
-  const ChangeLogin = (e) => {
-    e.preventDefault();
-    navigate("/login");
-  };
 
   return (
     <nav className="bg-transparent text-black top-0 z-50 text-base w-full">
@@ -32,36 +24,31 @@ const Navbar = () => {
         {/* Center: Nav links */}
         <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-8">
           {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`${
-                location.pathname === link.to
-                  ? 'text-black font-semibold'
-                  : 'text-gray-600 hover:text-neutral-800'
-              } text-xl transition`}
+            <a
+              key={link.href}
+              href={link.href}
+              className="text-gray-600 hover:text-neutral-800 text-xl transition"
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </div>
 
         {/* Right: Auth buttons or greeting */}
         <div className="flex gap-4 items-center">
-          <button
-            onClick={ChangeLogin}
+          <a
+            href="https://app-reminded.vercel.app/login"
             classNamee="font-semibold text-sm border border-gray-300 rounded-md px-4 py-2 text-gray-800 hover:bg-gray-200 transition cursor-pointer"
           >
             Login
-          </button>
+          </a>
 
-
-          <button
-            onClick={ChangeSignUp}
+          <a
+            href="https://app-reminded.vercel.app/signup"
             className="font-semibold text-sm rounded-md px-4 py-2 bg-gray-900 text-white hover:bg-gray-700 transition cursor-pointer"
           >
             Sign up
-          </button>
+          </a>
         </div>
       </div>
     </nav>

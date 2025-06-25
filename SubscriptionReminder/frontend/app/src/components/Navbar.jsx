@@ -7,20 +7,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth(); // ✅ Access auth context
 
-  const navLinks = [
-    { to: '/home', label: 'Home' },
-    { to: '/product', label: 'Demo' },
+    const navLinks = [
+    { href: 'https://reminded.vercel.app/home', label: 'Home' },
+    { href: 'https://app-reminded.vercel.app/product', label: 'Demo'},
   ];
 
-  const ChangeSignUp = (e) => {
-    e.preventDefault();
-    navigate("/signup");
-  };
 
-  const ChangeLogin = (e) => {
-    e.preventDefault();
-    navigate("/login");
-  };
 
   return (
     <nav className="bg-transparent text-black top-0 z-50 text-base w-full">
@@ -34,17 +26,13 @@ const Navbar = () => {
         {/* Center: Nav links */}
         <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-8">
           {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`${
-                location.pathname === link.to
-                  ? 'text-black font-semibold'
-                  : 'text-gray-600 hover:text-neutral-800'
-              } text-xl transition`}
+            <a
+              key={link.href}
+              href={link.href}
+              className="text-gray-600 hover:text-neutral-800 text-xl transition"
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </div>
 

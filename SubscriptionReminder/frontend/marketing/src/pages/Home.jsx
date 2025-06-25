@@ -10,10 +10,6 @@ import { ChevronRight } from 'lucide-react';
 const Home = () => {
   const navigate = useNavigate();
 
-  const ChangePage = (e) => {
-    e.preventDefault();
-      navigate('/signup');
-  };
 
 
   // bg-gradient-to-br from-[#fdfcf9] to-[#f6f3ef] option 1
@@ -40,12 +36,12 @@ const Home = () => {
                 
 
                   <div className="">
-                    <button
-                      onClick={ChangePage}
+                    <a
+                      href="https://app-reminded.vercel.app/signup"
                       className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md font-semibold tracking-wide text-base cursor "
                     >
                       Try it free
-                    </button>
+                    </a>
                   </div>
                   </div>
 
@@ -85,13 +81,14 @@ const Home = () => {
                 </div>
 
               <div className="text-center mb-6 mt-6">
-                  <button
-                    onClick={ChangePage}
+                  <a
+                    href="https://app-reminded.vercel.app/signup"
                     className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md fong-semibold tracking-wide text-base cursor-pointer"
                   >
                     Try It Free
-                  </button>
+                  </a>
               </div>
+
 
                 <p className="text-lg text-text/80 max-w-2xl mx-auto text-gray-700 mt-1 mb-9"> Three simple steps. One confident learner.</p>
 
@@ -160,12 +157,12 @@ const Home = () => {
                   <h1 className="text-3xl font-['Poppins] mt-5"> Sign Up Now And Never Waste Your Money Again</h1>
                   <p className="mt-4 text-xl "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
 
-                  <button
-                    onClick={ChangePage}
+                  <a
+                    href="https://app-reminded.vercel.app/signup"
                     className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md fong-semibold tracking-wide text-base mt-7 cursor-pointer"
                   >
                     Try It Free
-                  </button>
+                  </a>
 
                   </div>
               </div>    
