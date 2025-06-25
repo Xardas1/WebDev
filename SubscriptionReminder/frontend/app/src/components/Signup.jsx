@@ -55,12 +55,6 @@ export default function Signup() {
         }
     };
 
-
-
-
-
-
-
     return (
         <form className="space-y-6" onSubmit={handleSubmit}>
         {fields.map(field => (
