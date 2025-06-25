@@ -1,0 +1,9 @@
+/* Pull in Tailwind (all layers) */
+@import "tailwindcss";
+
+/* Your global tweaks ------------------------- */
+@layer base {
+  body {
+    @apply text-white bg-gradient-to-br from-[#f5f7fa] to-[#e4e7eb];
+  }
+}
