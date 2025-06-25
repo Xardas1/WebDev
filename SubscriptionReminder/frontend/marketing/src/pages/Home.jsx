@@ -9,9 +9,6 @@ import { ChevronRight } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
-
-
-
   // bg-gradient-to-br from-[#fdfcf9] to-[#f6f3ef] option 1
   // bg-gradient-to-br from-[#f5f7fa] to-[#e4e7eb]
   return (
