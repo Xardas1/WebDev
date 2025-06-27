@@ -9,3 +9,4 @@ sendgrid
 email-validator
 python-multipart
 apscheduler
+python==3.11
