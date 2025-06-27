@@ -20,7 +20,7 @@ const Home = () => {
 
 
                 <div className="text-center flex flex-col items-center">
-                    <h1 className="font-['Poppins'] font-extrabold text-7xl tracking-tight leading-tight mb-6">
+                    <h1 className="font-['Poppins'] font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-tight mb-6">
                       Never Forget &<br /> Waste Your <br />
                       Money Ever Again
                     </h1>
