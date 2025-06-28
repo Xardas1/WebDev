@@ -41,7 +41,8 @@ export default function Signup() {
             });
 
             console.log("Navigating to /home...")
-            navigate("/home");
+            window.location.href = 'https://reminded.vercel.app/home';
+
 
 
             // Use the context login method (if you use AuthContext)
