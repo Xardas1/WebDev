@@ -87,7 +87,7 @@ const Home = () => {
               </div>
 
 
-                <p className="text-lg text-text/80 max-w-2xl mx-auto text-gray-700 mt-1 mb-9"> Three simple steps. One confident learner.</p>
+                <p className="text-lg text-text/80 max-w-2xl mx-auto text-gray-700 mt-1 mb-6"> Three simple steps. One confident learner.</p>
 
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -150,7 +150,7 @@ const Home = () => {
                 </div>
 
                 <div className="flex justify-center text-white "> 
-                <div className="w-full max-w-[1000px] px-4 md:px-10 bg-gradient-to-r from-gray-900 to-gray-800 pt-8 pb-10 px-10 rounded-3xl shadow-md hover:shadow-lg transition text-center mt-10 mb-30 ">
+                <div className="w-full max-w-[1000px] px-4 md:px-10 bg-gradient-to-r from-gray-900 to-gray-800 pt-8 pb-10 px-10 rounded-3xl shadow-md hover:shadow-lg transition text-center mt-10 mb-6 ">
                   <h1 className="text-3xl font-['Poppins] mt-5"> Sign Up Now And Never Waste Your Money Again</h1>
                   <p className="mt-4 text-xl mb-8 "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
 
