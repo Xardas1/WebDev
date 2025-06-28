@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     setToken(newToken);
     localStorage.setItem('token', newToken);
     fetchUser(newToken);
-    navigate('/home');  // Redirect to dashboard after successful login
+    window.location.href = 'https://reminded.vercel.app/home';
   };
 
   // ✅ Improved logout function with redirection
