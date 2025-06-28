@@ -38,7 +38,7 @@ const Navbar = () => {
         <div className="flex gap-4 items-center">
           <a
             href="https://app-reminded.vercel.app/login"
-            classNamee="font-semibold text-sm border border-gray-300 rounded-md px-4 py-2 text-gray-800 hover:bg-gray-200 transition cursor-pointer"
+            className="font-semibold text-sm border border-gray-300 rounded-md px-4 py-2 text-gray-800 hover:bg-gray-200 transition cursor-pointer"
           >
             Login
           </a>

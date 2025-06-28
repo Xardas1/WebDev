@@ -20,13 +20,13 @@ const Home = () => {
 
 
                 <div className="text-center flex flex-col items-center">
-                    <h1 className="font-['Poppins'] font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-tight mb-6">
+                    <h1 className="font-['Poppins'] font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-tight mb-3">
                       Never Forget &<br /> Waste Your <br />
                       Money Ever Again
                     </h1>
 
 
-                    <p className="font-['Inter'] text-lg text-gray-600 leading-relaxed max-w-md md:max-w-xl mb-8 mb-auto">
+                    <p className="font-['Inter'] text-lg text-gray-600 leading-relaxed max-w-md md:max-w-xl mb-8 mb-6">
                       Re:Mind brings you a slek, modern way to always remember about 
                       your subscriptions and never waste money again. With just few clicks you can stop 
                       wasting and enjoy your full pocket again.</p>
@@ -35,7 +35,7 @@ const Home = () => {
                   <div className="">
                     <a
                       href="https://app-reminded.vercel.app/signup"
-                      className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md font-semibold tracking-wide text-base cursor "
+                      className="bg-black text-white px-8 py-3 mb-5 rounded-lg hover:bg-neutral-800 active:scale-95 transition-transform shadow-md font-semibold tracking-wide text-base cursor-pointer"
                     >
                       Try it free
                     </a>
@@ -152,7 +152,7 @@ const Home = () => {
                 <div className="flex justify-center text-white "> 
                 <div className="w-full max-w-[1000px] px-4 md:px-10 bg-gradient-to-r from-gray-900 to-gray-800 pt-8 pb-10 px-10 rounded-3xl shadow-md hover:shadow-lg transition text-center mt-10 mb-30 ">
                   <h1 className="text-3xl font-['Poppins] mt-5"> Sign Up Now And Never Waste Your Money Again</h1>
-                  <p className="mt-4 text-xl "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
+                  <p className="mt-4 text-xl mb-8 "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
 
                   <a
                     href="https://app-reminded.vercel.app/signup"
