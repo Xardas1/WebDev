@@ -15,7 +15,7 @@ const Home = () => {
 
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#f5f7fa] to-[#e4e7eb]">
         <main className="flex-grow flex justify-center">
-              <div className="mt-10 mb-50` max-w-7xl">
+              <div className="mt-6 mb-12 px-4 md:px-12">
                 <div className="text-black flex flex-col justify-center">
 
 
@@ -26,7 +26,7 @@ const Home = () => {
                     </h1>
 
 
-                    <p className="font-['Inter'] text-lg text-gray-600 leading-relaxed max-w-xl mb-8">
+                    <p className="font-['Inter'] text-lg text-gray-600 leading-relaxed max-w-md md:max-w-xl mb-8 mb-auto">
                       Re:Mind brings you a slek, modern way to always remember about 
                       your subscriptions and never waste money again. With just few clicks you can stop 
                       wasting and enjoy your full pocket again.</p>
@@ -46,7 +46,7 @@ const Home = () => {
                   <h1 className="text-5xl font-['Poppins']" > Everything You Need to Stop Wasting Money Now</h1>
                 </div>
 
-                <div className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-6 m-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 m-6">
                   <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
                     <div className="text-purple-600 text-3xl mb-4">🔔</div>
                     <h3 className="text-lg font-semibold mb-2">Stop forgetting subscriptions</h3>
@@ -150,7 +150,7 @@ const Home = () => {
                 </div>
 
                 <div className="flex justify-center text-white "> 
-                <div className="w-full max-w-[1000px] bg-gradient-to-r from-gray-900 to-gray-800 pt-8 pb-10 px-10 rounded-3xl shadow-md hover:shadow-lg transition text-center mt-10 mb-30 ">
+                <div className="w-full max-w-[1000px] px-4 md:px-10 bg-gradient-to-r from-gray-900 to-gray-800 pt-8 pb-10 px-10 rounded-3xl shadow-md hover:shadow-lg transition text-center mt-10 mb-30 ">
                   <h1 className="text-3xl font-['Poppins] mt-5"> Sign Up Now And Never Waste Your Money Again</h1>
                   <p className="mt-4 text-xl "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
 
