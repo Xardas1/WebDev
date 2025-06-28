@@ -10,7 +10,7 @@ SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 SENDER_EMAIL = "remind44342@gmail.com"
 
 def send_verification_email(to_email, token):
-    verification_link = f"http://localhost:8000/verify-email?token={token}"
+    verification_link = f"https://app-reminded.vercel.app//verify-email?token={token}"
     subject = "Please verify your email for Re:Mind"
     html_content = f"""
             <p>Hello, 👋 <br>
@@ -65,7 +65,7 @@ def send_reminder_email(to_email, sub_name, deadline):
 
 
 def send_password_reset_email(to_email, token):
-    reset_link = f"http://localhost:5173/reset-password?token={token}"
+    reset_link = f"https://app-reminded.vercel.app//reset-password?token={token}"
 
     subject = "🔐 Reset your password - Re:Mind"
     html_content = f"""
