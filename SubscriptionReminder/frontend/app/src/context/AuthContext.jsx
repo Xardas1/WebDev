@@ -25,7 +25,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
-    navigate('/');  // Redirect to login page after logout
+    window.location.href = 'https://reminded.vercel.app/home';
+    // Redirect to login page after logout
   };
 
   // ✅ Fetch user data from the server
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       localStorage.removeItem('token');
       setLoading(false);
-      navigate('/');  // Redirect to login if no token
+      window.location.href = 'https://reminded.vercel.app/home';
       return;
     }
 
@@ -54,7 +55,8 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setToken(null);
       localStorage.removeItem('token');
-      navigate('/');  // Redirect to login on error
+      window.location.href = 'https://reminded.vercel.app/home';
+
     } finally {
       setLoading(false);
     }
