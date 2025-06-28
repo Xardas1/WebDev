@@ -10,7 +10,7 @@ SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 SENDER_EMAIL = "remind44342@gmail.com"
 
 def send_verification_email(to_email, token):
-    verification_link = f"https://app-reminded.vercel.app//verify-email?token={token}"
+    verification_link = f"https://app-reminded.vercel.app//reset-password?token={token}"
     subject = "Please verify your email for Re:Mind"
     html_content = f"""
             <p>Hello, 👋 <br>
