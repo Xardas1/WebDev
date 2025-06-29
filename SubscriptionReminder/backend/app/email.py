@@ -3,14 +3,14 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
 from sendgrid.helpers.mail import Mail, Email, To, Content
-load_dotenv()
+
 
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-SENDER_EMAIL = "remind44342@gmail.com"
+SENDER_EMAIL = "noreply@re-mind.xyz"
 
 def send_verification_email(to_email, token):
-    verification_link = f"https://app-reminded.vercel.app//reset-password?token={token}"
+    verification_link = f"https://app.re-mind.xyz/reset-password?token={token}"
     subject = "Please verify your email for Re:Mind"
     html_content = f"""
             <p>Hello, 👋 <br>
@@ -22,7 +22,7 @@ def send_verification_email(to_email, token):
             </p>    
     """
 
-    from_email = Email("remind44342@gmail.com", "Re:Mind Team")
+    from_email = Email("noreply@re-mind.xyz", "Re:Mind Team")
     message = Mail(
         from_email=SENDER_EMAIL,
         to_emails=to_email,
@@ -65,7 +65,7 @@ def send_reminder_email(to_email, sub_name, deadline):
 
 
 def send_password_reset_email(to_email, token):
-    reset_link = f"https://app-reminded.vercel.app//reset-password?token={token}"
+    reset_link = f"https://app.re-mind.xyz//reset-password?token={token}"
 
     subject = "🔐 Reset your password - Re:Mind"
     html_content = f"""
