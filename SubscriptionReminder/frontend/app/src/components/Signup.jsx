@@ -41,7 +41,7 @@ export default function Signup() {
             });
 
             console.log("Navigating to /home...")
-            window.location.href = 'https://reminded.vercel.app/home';
+            window.location.href = 'https://www.re-mind.xyz/';
 
 
 

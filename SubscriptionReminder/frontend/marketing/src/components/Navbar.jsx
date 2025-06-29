@@ -6,8 +6,8 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navLinks = [
-    { href: 'https://reminded.vercel.app/home', label: 'Home' },
-    { href: 'https://app-reminded.vercel.app/product', label: 'Demo'},
+    { href: 'https://www.re-mind.xyz/home', label: 'Home' },
+    { href: 'https://app.re-mind.xyz/product', label: 'Demo'},
   ];
 
 
@@ -37,14 +37,14 @@ const Navbar = () => {
         {/* Right: Auth buttons or greeting */}
         <div className="flex gap-4 items-center">
           <a
-            href="https://app-reminded.vercel.app/login"
+            href="https://app.re-mind.xyz/login"
             className="font-semibold text-sm border border-gray-300 rounded-md px-4 py-2 text-gray-800 hover:bg-gray-200 transition cursor-pointer"
           >
             Login
           </a>
 
           <a
-            href="https://app-reminded.vercel.app/signup"
+            href="https://app.re-mind.xyz/signup"
             className="font-semibold text-sm rounded-md px-4 py-2 bg-gray-900 text-white hover:bg-gray-700 transition cursor-pointer"
           >
             Sign up

@@ -34,7 +34,7 @@ const Home = () => {
 
                   <div className="">
                     <a
-                      href="https://app-reminded.vercel.app/signup"
+                      href="https://app.re-mind.xyz/signup"
                       className="bg-black text-white px-8 py-3 mb-5 rounded-lg hover:bg-neutral-800 active:scale-95 transition-transform shadow-md font-semibold tracking-wide text-base cursor-pointer"
                     >
                       Try it free
@@ -79,7 +79,7 @@ const Home = () => {
 
               <div className="text-center mb-6 mt-6">
                   <a
-                    href="https://app-reminded.vercel.app/signup"
+                    href="https://app.re-mind.xyz/signup"
                     className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md fong-semibold tracking-wide text-base cursor-pointer"
                   >
                     Try It Free
@@ -155,7 +155,7 @@ const Home = () => {
                   <p className="mt-4 text-xl mb-8 "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
 
                   <a
-                    href="https://app-reminded.vercel.app/signup"
+                    href="https://app.re-mind.xyz/signup"
                     className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md fong-semibold tracking-wide text-base mt-7 cursor-pointer"
                   >
                     Try It Free

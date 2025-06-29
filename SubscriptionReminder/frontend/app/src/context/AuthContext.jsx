@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     setToken(newToken);
     localStorage.setItem('token', newToken);
     fetchUser(newToken);
-    window.location.href = 'https://reminded.vercel.app/home';
+    window.location.href = 'https://www.re-mind.xyz/home';
   };
 
   // ✅ Improved logout function with redirection
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
-    window.location.href = 'https://reminded.vercel.app/home';
+    window.location.href = 'https://www.re-mind.xyz/home';
     // Redirect to login page after logout
   };
 
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       localStorage.removeItem('token');
       setLoading(false);
-      window.location.href = 'https://reminded.vercel.app/home';
+      window.location.href = 'https://www.re-mind.xyz/home';
       return;
     }
 
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setToken(null);
       localStorage.removeItem('token');
-      window.location.href = 'https://reminded.vercel.app/home';
+      window.location.href = 'https://www.re-mind.xyz/home';
 
     } finally {
       setLoading(false);
