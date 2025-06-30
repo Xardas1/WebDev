@@ -17,7 +17,7 @@ load_dotenv()
 app = FastAPI()
 
 origins = [
-    "https://.*\.vercel\.app",
+    "https://app.re-mind.xyz/",
     "http://localhost:5173/"
 ]
 
