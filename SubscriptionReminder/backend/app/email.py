@@ -65,7 +65,7 @@ def send_reminder_email(to_email, sub_name, deadline):
 
 
 def send_password_reset_email(to_email, token):
-    reset_link = f"https://app.re-mind.xyz//reset-password?token={token}"
+    reset_link = f"https://app.re-mind.xyz/reset-password?token={token}"
 
     subject = "🔐 Reset your password - Re:Mind"
     html_content = f"""
