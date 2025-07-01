@@ -124,14 +124,20 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 async def get_current_user(
-    token: str = Cookie(None),            # ✅ token from cookie instead of OAuth header
-    db: Session = Depends(get_db)
+    request: Request,
+    token: str = Cookie(None),  # token from cookie
+    db: Session = Depends(get_db),
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    # ✅ Guard against missing/malformed tokens BEFORE jwt.decode()
+    if not token or token.count(".") != 2:
+        raise credentials_exception
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
@@ -145,12 +151,6 @@ async def get_current_user(
         raise credentials_exception
 
     return user
-
-async def get_current_active_user(current_user: Annotated[models.User, Depends(get_current_user)]):
-    if not current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
 
 @router.post("/token")
 async def login_for_access_token(
