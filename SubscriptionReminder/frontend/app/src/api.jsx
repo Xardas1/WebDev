@@ -3,21 +3,30 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://webdev-production-4c80.up.railway.app/',
-  withCredentials: true,
+  withCredentials: true, // ✅ Include cookies in *every* request
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// ✅ LOGIN: use this to get the token + set-cookie on login
+export const login = async (email, password) => {
+  try {
+    const response = await api.post(
+      '/token',
+      new URLSearchParams({
+        username: email,
+        password: password,
+      }),
+      {
+        withCredentials: true, // ✅ CRITICAL: browser accepts the cookie
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error;
+  }
+};
 
-// Fetch subscriptions function
+// ✅ Fetch subscriptions (example protected route)
 export const fetchSubscriptions = async () => {
   try {
     const response = await api.get('/subscriptions/');
@@ -27,6 +36,5 @@ export const fetchSubscriptions = async () => {
     throw error;
   }
 };
-
 
 export default api;

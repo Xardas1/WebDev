@@ -20,27 +20,30 @@ export default function Login() {
     setLoginState({ ...loginState, [e.target.name]: e.target.value });
   };
 
+
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const params = new URLSearchParams();
-      params.append('username', loginState.email);
-      params.append('password', loginState.password);
+  try {
+    const params = new URLSearchParams();
+    params.append('username', loginState.email);
+    params.append('password', loginState.password);
 
-      const response = await api.post('/token', params, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        }
-      });
+    await api.post('/token', params, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      withCredentials: true, // ✅ CRUCIAL
+    });
 
-      login(response.data.access_token);
-
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please check your credentials.')
-    }
-  };
+    // ✅ Do NOT call login() with token — just fetch the user from cookie
+    login(); // <- this will now just call fetchUser()
+  } catch (error) {
+    console.error('Login failed:', error);
+    alert('Login failed. Please check your credentials.');
+  }
+};
 
   return (
     <form className="space-y-6 " onSubmit={handleSubmit}>
