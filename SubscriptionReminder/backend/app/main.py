@@ -19,15 +19,20 @@ app = FastAPI()
 origins = [
     "https://www.re-mind.xyz",
     "https://app.re-mind.xyz",
+    "https://re-mind.xyz",
     # local development:
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
+
+origin_regex = r"^https:\/\/(?:.*\.)?re\-mind\.xyz$"
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https://.*\.re\-mind\.xyz",  # ✅ catches any sub-domain
+    allow_origin_regex=origin_regex,  # ✅ catches any sub-domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["Authorization", "Content-Type", "*"],
@@ -108,3 +113,10 @@ def check_upcoming_deadlines():
 scheduler = BackgroundScheduler()
 scheduler.add_job(check_upcoming_deadlines, 'interval', days=1)
 scheduler.start()
+
+
+@app.middleware("http")
+async def debug_origin(request, call_next):
+    print(">>> ORIGIN HEADER:", request.headers.get("origin"))
+    response = await call_next(request)
+    return response
