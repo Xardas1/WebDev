@@ -4,13 +4,30 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   const navLinks = [
     { href: 'https://www.re-mind.xyz/home', label: 'Home' },
     { href: 'https://app.re-mind.xyz/product', label: 'Demo'},
   ];
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
+    axios.get("https://webdev-production-4c80.up.railway.app/users/me/", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then ((res) => {
+      setUser(res.data);
+    })
+    .catch(() => {
+      localStorage.removeItem("token");
+      setUser(null);
+    });
+  }, []);
 
   return (
     <nav className="bg-transparent text-black top-0 z-50 text-base w-full">
