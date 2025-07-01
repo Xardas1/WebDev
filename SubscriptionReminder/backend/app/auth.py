@@ -17,6 +17,9 @@ from .database import SessionLocal
 from passlib.context import CryptContext
 import os
 from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
+from fastapi import Response
+from fastapi import Cookie
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
@@ -119,23 +122,28 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db : Session = Depends(get_db)):
+
+async def get_current_user(
+    token: str = Cookie(None),            # ✅ token from cookie instead of OAuth header
+    db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}, 
-        )
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(sub=username)
-    except InvalidTokenError:
+    except JWTError:
         raise credentials_exception
-    user = get_user(db, username=token_data.sub)
+
+    user = get_user(db, username=username)
     if user is None:
         raise credentials_exception
+
     return user
 
 async def get_current_active_user(current_user: Annotated[models.User, Depends(get_current_user)]):
@@ -161,7 +169,17 @@ async def login_for_access_token(
         data={"sub": user.email},
         expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    response = JSONResponse(content={"message": "Login Successful"})
+    response.set_cookie(
+        key="token",
+        value=access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        domain=".re-mind.xyz",
+        max_age=60 * 60 * 24
+    )
+    return response
 
 
 @router.get("/users/me/", response_model=UserOut)

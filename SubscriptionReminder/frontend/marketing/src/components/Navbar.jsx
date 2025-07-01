@@ -13,20 +13,14 @@ const Navbar = () => {
   ];
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     axios.get("https://webdev-production-4c80.up.railway.app/users/me/", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      withCredentials: true, // ✅ This tells browser to send cookies
     })
     .then((res) => {
       setUser(res.data);
     })
     .catch(() => {
-      localStorage.removeItem("token");
-      setUser(null);
+      setUser(null); // not logged in or token invalid
     });
   }, []);
 
@@ -60,10 +54,18 @@ const Navbar = () => {
                 Hello, {user.username}
               </span>
               <button
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  setUser(null);
-                  window.location.reload();
+                onClick={async () => {
+                  try {
+                    await axios.post(
+                      "https://webdev-production-4c80.up.railway.app/logout",
+                      {},
+                      { withCredentials: true }
+                    );
+                    setUser(null);
+                    window.location.reload();
+                  } catch (err) {
+                    console.error("Logout failed", err);
+                  }
                 }}
                 className="text-sm px-3 py-2 border rounded-md hover:bg-gray-200 transition"
               >

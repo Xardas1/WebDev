@@ -16,18 +16,15 @@ load_dotenv()
 
 app = FastAPI()
 
-origins = [
-    "https://app.re-mind.xyz/",
-    "http://localhost:5173/"
-]
-
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex="https://app.re-mind.xyz",
+    allow_origins=[
+        "https://app.re-mind.xyz",
+        "https://www.re-mind.xyz",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
