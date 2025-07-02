@@ -49,9 +49,14 @@ def get_user(db: Session, username: str):
 
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
-    if not user or not verify_password(password, user.hashed_password):
+    print("User found:", user)
+    if not user:
+        return False
+    print("Password check:", verify_password(password, user.hashed_password))
+    if not verify_password(password, user.hashed_password):
         return False
     return user
+
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
