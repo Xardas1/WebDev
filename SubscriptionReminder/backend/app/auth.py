@@ -7,11 +7,10 @@ from fastapi import (
     HTTPException,
     status,
     Cookie,
-    Request,            #  ← NEW
+    Request,
 )
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
-
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
@@ -29,6 +28,7 @@ from .email import send_verification_email, send_password_reset_email
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+RESET_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -38,7 +38,7 @@ router = APIRouter()
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-def verify_password(plain, hashed):      # bcrypt check
+def verify_password(plain, hashed):
     return pwd_context.verify(plain, hashed)
 
 def get_password_hash(password):
@@ -55,29 +55,22 @@ def authenticate_user(db: Session, username: str, password: str):
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=15)
-    )
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Dependency that reads the JWT from the cookie
+# Dependencies
 # ──────────────────────────────────────────────────────────────────────────────
 
 async def get_current_user(
     request: Request,
-    token: str = Cookie(None),           # token now comes from cookie
+    token: str = Cookie(None),
     db: Session = Depends(get_db),
 ):
-    # ① short-circuit: no cookie ⇒ 401 (pre-flight OPTIONS will just pass through)
     if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
-    # ② validate JWT
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
@@ -86,7 +79,7 @@ async def get_current_user(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = get_user(db, username=username)
+    user = get_user(db, username)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
     return user
@@ -99,7 +92,7 @@ async def get_current_active_user(
     return current_user
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Routes
+# Auth Routes
 # ──────────────────────────────────────────────────────────────────────────────
 
 @router.post("/token")
@@ -110,7 +103,7 @@ async def login_for_access_token(
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -144,4 +137,106 @@ async def read_users_me(
 ):
     return current_user
 
-# … (register, forgot password, etc. stay unchanged)
+# ──────────────────────────────────────────────────────────────────────────────
+# Registration + Email Verification
+# ──────────────────────────────────────────────────────────────────────────────
+
+@router.post("/register", response_model=UserOut)
+async def register_endpoint(registred_user: UserCreate, db: Session = Depends(get_db)):
+    # Username + Email uniqueness
+    if db.query(User).filter(User.username == registred_user.username).first():
+        raise HTTPException(status_code=400, detail="Username already exists")
+    if db.query(User).filter(User.email == registred_user.email).first():
+        raise HTTPException(status_code=400, detail="Email already exists")
+
+    # Create user
+    hashed_pw = get_password_hash(registred_user.password)
+    db_user = User(
+        username=registred_user.username,
+        email=registred_user.email,
+        hashed_password=hashed_pw,
+        is_active=True,
+        is_verified=False,
+    )
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+
+    # Optional: email verification
+    verification_token = create_access_token(
+        data={"sub": db_user.email},
+        expires_delta=timedelta(minutes=30),
+    )
+    send_verification_email(db_user.email, verification_token)
+
+    return db_user
+
+@router.get("/verify-email")
+def verify_email(token: str, db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=400, detail="Invalid token")
+
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user.is_verified = True
+        db.commit()
+        return {"message": "✅ Email verified successfully!"}
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=400, detail="Verification link expired")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid verification link")
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Forgot + Reset Password
+# ──────────────────────────────────────────────────────────────────────────────
+
+class EmailRequest(BaseModel):
+    email: EmailStr
+
+@router.post("/forgot-password")
+def forgot_password(request: EmailRequest):
+    mail = request.email
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.email == mail).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        token_data = {
+            "sub": user.email,
+            "exp": datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES),
+        }
+        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        send_password_reset_email(user.email, token)
+        return {"message": "Reset email sent"}
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+@router.post("/reset-password")
+def reset_password(data: ResetPasswordRequest):
+    try:
+        payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=400, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        hashed = get_password_hash(data.new_password)
+        user.hashed_password = hashed
+        db.commit()
+
+    return {"message": "Password reset successful"}
