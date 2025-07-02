@@ -149,6 +149,7 @@ async def read_users_me(
 @router.post("/register", response_model=UserOut)
 async def register_endpoint(registred_user: UserCreate, db: Session = Depends(get_db)):
     # Username + Email uniqueness
+    print("Register payload:", registred_user)
     if db.query(User).filter(User.username == registred_user.username).first():
         raise HTTPException(status_code=400, detail="Username already exists")
     if db.query(User).filter(User.email == registred_user.email).first():

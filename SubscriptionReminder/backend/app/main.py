@@ -24,17 +24,15 @@ origins = [
     "http://127.0.0.1:3000"
 ]
 
-# ✅ Regex to catch subdomains like app.re-mind.xyz
-origin_regex = r"^https:\/\/(?:.*\.)?re\-mind\.xyz$"
+
 
 # ✅ CORS middleware (MUST come before routes)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["Authorization", "Content-Type", "*"],
+    allow_headers=["*"],
 )
 
 # ✅ Optional: log frontend origin to debug CORS
