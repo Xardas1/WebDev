@@ -1,4 +1,4 @@
-app = "ReMind"
+app = "remind"
 
 [build]
   builtin = "python"  # Let Fly use the Python buildpack
