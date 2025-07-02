@@ -1,12 +1,11 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-python-dotenv
-psycopg2-binary
+fastapi==0.110
+uvicorn[standard]==0.29
+sqlalchemy==2.0
+psycopg2-binary==2.9
+python-multipart==0.0.9     # needed for form uploads
 passlib[bcrypt]==1.7.4
-bcrypt==3.2.2
-python-jose
-sendgrid
-email-validator
-python-multipart
-apscheduler
+bcrypt==4.1.2
+python-jose[cryptography]==3.3
+python-dotenv==1.0
+sendgrid==6.11
+apscheduler==3.10
