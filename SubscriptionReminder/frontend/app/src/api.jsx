@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://webdev-production-4c80.up.railway.app/',
+  baseURL: 'https://api.re-mind.xyz/',
   withCredentials: true, // ✅ Include cookies in *every* request
 });
 
