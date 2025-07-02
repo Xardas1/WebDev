@@ -1,5 +1,2 @@
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-print(pwd_context.verify("test123", "$2b$12$Q9zYxx2hdcIQmCPB2llyFeVaxY9NBa6T0.3K9qfnwJHZYSk1UoS3i"))
+import bcrypt
+print(bcrypt.__about__.__version__)  # should print: 3.2.2
