@@ -1,28 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth } from '../../../app/src/context/AuthContext'; // ✅ use correct path
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, logout, loading, fetchUser } = useAuth();
 
   const navLinks = [
     { href: 'https://www.re-mind.xyz/home', label: 'Home' },
     { href: 'https://app.re-mind.xyz/product', label: 'Demo' },
   ];
 
+  // ✅ Try to get the user if not already available
   useEffect(() => {
-    axios.get("https://webdev-production-4c80.up.railway.app/users/me/", {
-      withCredentials: true, // ✅ This tells browser to send cookies
-    })
-    .then((res) => {
-      setUser(res.data);
-    })
-    .catch(() => {
-      setUser(null); // not logged in or token invalid
-    });
-  }, []);
+    if (!user && !loading) {
+      fetchUser(); // defined in AuthContext
+    }
+  }, [user, loading, fetchUser]);
 
   return (
     <nav className="bg-transparent text-black top-0 z-50 text-base w-full">
@@ -54,19 +49,7 @@ const Navbar = () => {
                 Hello, {user.username}
               </span>
               <button
-                onClick={async () => {
-                  try {
-                    await axios.post(
-                      "https://webdev-production-4c80.up.railway.app/logout",
-                      {},
-                      { withCredentials: true }
-                    );
-                    setUser(null);
-                    window.location.reload();
-                  } catch (err) {
-                    console.error("Logout failed", err);
-                  }
-                }}
+                onClick={logout}
                 className="text-sm px-3 py-2 border rounded-md hover:bg-gray-200 transition"
               >
                 Log out
