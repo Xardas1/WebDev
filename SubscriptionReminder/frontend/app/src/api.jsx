@@ -3,11 +3,11 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://api.re-mind.xyz/',
-  withCredentials: true, // ✅ Include cookies in *every* request
+  withCredentials: true, // ✅ Send cookies automatically
 });
 
-// ✅ LOGIN: use this to get the token + set-cookie on login
-export const login = async (email, password) => {
+// ✅ POST /token → logs user in, cookie is set by server
+export const loginWithCredentials = async (email, password) => {
   try {
     const response = await api.post(
       '/token',
@@ -16,7 +16,9 @@ export const login = async (email, password) => {
         password: password,
       }),
       {
-        withCredentials: true, // ✅ CRITICAL: browser accepts the cookie
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       }
     );
     return response.data;
@@ -26,7 +28,7 @@ export const login = async (email, password) => {
   }
 };
 
-// ✅ Fetch subscriptions (example protected route)
+// ✅ Example of protected request
 export const fetchSubscriptions = async () => {
   try {
     const response = await api.get('/subscriptions/');
