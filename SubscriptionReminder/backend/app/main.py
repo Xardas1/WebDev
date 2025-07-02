@@ -1,147 +1,123 @@
-from datetime import datetime, timedelta, timezone
-from typing import Annotated
-
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-    Cookie,
-    Request,            #  ← NEW
-)
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.responses import JSONResponse
-
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from . import models, schemas
+from .models import Base, Subscriptions, User
+from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
-import os
+from .auth import get_current_user
+from .auth import router as auth_router
+from dotenv import load_dotenv
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
+from .email import send_reminder_email
 
-from .database import get_db, SessionLocal
-from . import models
-from .models import User
-from .schemas import Token, UserCreate, UserOut
-from .email import send_verification_email, send_password_reset_email
+load_dotenv()
 
-# ──────────────────────────────────────────────────────────────────────────────
+app = FastAPI()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+# ✅ Allow cross-origin cookies from frontend
+origins = [
+    "https://app.re-mind.xyz",
+    "https://www.re-mind.xyz",
+    "https://re-mind.xyz",                # optional, fallback base domain
+    "http://localhost:3000",             # local dev
+    "http://127.0.0.1:3000"
+]
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-router = APIRouter()
+# ✅ Regex to catch subdomains like app.re-mind.xyz
+origin_regex = r"^https:\/\/(?:.*\.)?re\-mind\.xyz$"
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────────────────────────────────────────
+# ✅ CORS middleware (MUST come before routes)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex=origin_regex,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["Authorization", "Content-Type", "*"],
+)
 
-def verify_password(plain, hashed):      # bcrypt check
-    return pwd_context.verify(plain, hashed)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-def get_user(db: Session, username: str):
-    return db.query(models.User).filter(models.User.email == username).first()
-
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user(db, username)
-    if not user or not verify_password(password, user.hashed_password):
-        return False
-    return user
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=15)
-    )
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Dependency that reads the JWT from the cookie
-# ──────────────────────────────────────────────────────────────────────────────
-
-async def get_current_user(
-    request: Request,
-    token: str = Cookie(None),           # token now comes from cookie
-    db: Session = Depends(get_db),
-):
-    # ① short-circuit: no cookie ⇒ 401 (pre-flight OPTIONS will just pass through)
-    if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
-
-    # ② validate JWT
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    user = get_user(db, username=username)
-    if user is None:
-        raise HTTPException(status_code=401, detail="User not found")
-    return user
-
-async def get_current_active_user(
-    current_user: Annotated[models.User, Depends(get_current_user)]
-):
-    if not current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Routes
-# ──────────────────────────────────────────────────────────────────────────────
-
-@router.post("/token")
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(get_db),
-) -> Token:
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token = create_access_token(
-        data={"sub": user.email},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-
-    response = JSONResponse(content={"message": "Login successful"})
-    response.set_cookie(
-        key="token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="lax",
-        domain=".re-mind.xyz",
-        max_age=60 * 60 * 24,
-    )
+# ✅ Optional: log frontend origin to debug CORS
+@app.middleware("http")
+async def debug_origin(request: Request, call_next):
+    print(">>> ORIGIN HEADER:", request.headers.get("origin"))
+    response = await call_next(request)
     return response
 
-@router.post("/logout")
-def logout_user():
-    response = JSONResponse(content={"message": "Logged out"})
-    response.delete_cookie("token", domain=".re-mind.xyz")
-    return response
+# ✅ Include auth routes (register, token, users/me)
+app.include_router(auth_router)
 
-@router.get("/users/me/", response_model=UserOut)
-async def read_users_me(
-    current_user: Annotated[models.User, Depends(get_current_active_user)]
-):
-    return current_user
+# ✅ Create tables if needed
+Base.metadata.create_all(bind=engine)
 
-# … (register, forgot password, etc. stay unchanged)
+# ✅ Subscription endpoints
+@app.get("/subscriptions/", response_model=list[schemas.SubscriptionResponse])
+def get_subscriptions(current_user: models.User = Depends(get_current_user)):
+    with Session(engine) as session:
+        subscriptions = session.query(Subscriptions).filter(
+            Subscriptions.user_id == current_user.id
+        ).all()
+    return subscriptions
+
+@app.post("/subscriptions/", response_model=schemas.SubscriptionCreate)
+def create_subscriptions(subscription: schemas.Subscription, current_user: models.User = Depends(get_current_user)):
+    db_subscription = Subscriptions(
+        subscription_name=subscription.subscription_name,
+        deadline=subscription.deadline,
+        user_id=current_user.id
+    )
+    with Session(engine) as session:
+        session.add(db_subscription)
+        session.commit()
+        session.refresh(db_subscription)
+        return db_subscription
+
+@app.delete("/subscriptions/{id}", response_model=schemas.SubscriptionResponse)
+def delete_subscriptions(id: int, current_user: models.User = Depends(get_current_user)):
+    with Session(engine) as session:
+        subscription = session.query(Subscriptions).get(id)
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        if subscription.user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized to delete this subscription")
+        session.delete(subscription)
+        session.commit()
+        return subscription
+
+@app.put("/subscriptions/{id}", response_model=schemas.SubscriptionResponse)
+def update_subscription(subscription_data: schemas.SubscriptionCreate, id: int, current_user: models.User = Depends(get_current_user)):
+    with Session(engine) as session:
+        subscription = session.query(Subscriptions).get(id)
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        if subscription.user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized to update this subscription")
+        
+        subscription.subscription_name = subscription_data.subscription_name
+        subscription.deadline = subscription_data.deadline
+        session.commit()
+        session.refresh(subscription)
+        return subscription
+
+# ✅ Optional reset (dangerous in prod)
+@app.post("/reset-db/")
+def reset_db():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    return {"message": "Database reset successfully!"}
+
+# ✅ Background job to check upcoming deadlines
+def check_upcoming_deadlines():
+    with SessionLocal() as db:
+        today = datetime.utcnow().date()
+        reminder_date = today + timedelta(days=3)
+        subs = db.query(Subscriptions).filter(Subscriptions.deadline == reminder_date).all()
+        for sub in subs:
+            user = db.query(User).filter(User.id == sub.user_id).first()
+            if user and user.is_verified:
+                send_reminder_email(user.email, sub.subscription_name, sub.deadline)
+
+# ✅ Start scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(check_upcoming_deadlines, 'interval', days=1)
+scheduler.start()
