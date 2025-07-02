@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import { loginFields } from '../constants/formFields';
 import Input from '../components/Input';
 import FormExtra from './FormExtra';
@@ -10,7 +10,7 @@ const fields = loginFields;
 let fieldsState = {};
 fields.forEach(field => fieldsState[field.name] = '');
 
-export default function Login() { 
+export default function Login() {
   const [loginState, setLoginState] = useState(fieldsState);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -20,33 +20,32 @@ export default function Login() {
     setLoginState({ ...loginState, [e.target.name]: e.target.value });
   };
 
-
-
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const params = new URLSearchParams();
-    params.append('username', loginState.email);
-    params.append('password', loginState.password);
+    try {
+      const params = new URLSearchParams();
+      params.append('username', loginState.email);
+      params.append('password', loginState.password);
 
-    await api.post('/token', params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      withCredentials: true, // ✅ CRUCIAL
-    });
+      // ✅ This sets the HTTP-only cookie
+      await api.post('/token', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        withCredentials: true,
+      });
 
-    // ✅ Do NOT call login() with token — just fetch the user from cookie
-    login(); // <- this will now just call fetchUser()
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login failed. Please check your credentials.');
-  }
-};
+      // ✅ Now fetches user using the cookie
+      login(); // will call fetchUser() in context
+    } catch (error) {
+      console.error('Login failed:', error);
+      setError('Login failed. Please check your credentials.');
+    }
+  };
 
   return (
-    <form className="space-y-6 " onSubmit={handleSubmit}>
+    <form className="space-y-6" onSubmit={handleSubmit}>
       {fields.map(field => (
         <Input
           key={field.id}
