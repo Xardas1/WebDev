@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
 
+
 class Subscription(BaseModel):
     subscription_name : str
     deadline : date
