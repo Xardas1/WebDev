@@ -9,7 +9,7 @@ SENDER_EMAIL = "noreply@re-mind.xyz"
 load_dotenv()
 
 def send_verification_email(to_email, token):
-    verification_link = f"https://app.re-mind.xyz/verification_link?token={token}"
+    verification_link = f"https://app.re-mind.xyz/verify-email?token={token}"
     subject = "Please verify your email for Re:Mind"
     html_content = f"""
         <p>Hello, 👋 <br>
