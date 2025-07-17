@@ -4,40 +4,39 @@ from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
 from sendgrid.helpers.mail import Mail, Email, To, Content
 
-
-
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 SENDER_EMAIL = "noreply@re-mind.xyz"
+load_dotenv()
 
 def send_verification_email(to_email, token):
-    verification_link = f"https://app.re-mind.xyz/reset-password?token={token}"
+    verification_link = f"https://app.re-mind.xyz/verification_link?token={token}"
     subject = "Please verify your email for Re:Mind"
     html_content = f"""
-            <p>Hello, 👋 <br>
-            Thanks for signing up to Re:Mind. To complete your registration, please click the link below to verify your email: <br>
-            <a href="{verification_link}">Verify Email</a></p>
-            
-            <p style="font-size: 12px; color: #888;">
-            If you didn't create this account, you can safely ignore this message.
-            </p>    
+        <p>Hello, 👋 <br>
+        Thanks for signing up to Re:Mind. To complete your registration, please click the link below to verify your email: <br>
+        <a href="{verification_link}">Verify Email</a></p>
+
+        <p style="font-size: 12px; color: #888;">
+        If you didn't create this account, you can safely ignore this message.
+        </p>    
     """
 
     from_email = Email("noreply@re-mind.xyz", "Re:Mind Team")
     message = Mail(
-        from_email=SENDER_EMAIL,
+        from_email=from_email,
         to_emails=to_email,
         subject=subject,
         html_content=html_content,
     )
-    message.add_content(Content("text/plain", f"Hello,\n\Thanks for signin up to Re:Mind. Please verify your mail by clicking this link: {verification_link}\n\nIf you didn't request this, ignore this email."))
-
+    message.add_content(Content("text/plain", f"Hello,\nThanks for signing up to Re:Mind. Please verify your email by clicking this link: {verification_link}\n\nIf you didn't request this, ignore this email."))
 
     try:
         sg = SendGridAPIClient(SENDGRID_API_KEY)
         sg.send(message)
         print("✅ Verification email sent.")
     except Exception as e:
-        print("❌ Failed to send email:", str(e))
+        print("❌ Failed to send email:", str(e)
+
 
 
 
