@@ -22,6 +22,7 @@ from . import models
 from .models import User
 from .schemas import Token, UserCreate, UserOut
 from .email import send_verification_email, send_password_reset_email
+from fastapi.responses import RedirectResponse
 
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -192,7 +193,9 @@ def verify_email(token: str, db: Session = Depends(get_db)):
 
         user.is_verified = True
         db.commit()
-        return {"message": "✅ Email verified successfully!"}
+    
+
+        return RedirectResponse(url="https://app.re-mind.xyz/product")
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=400, detail="Verification link expired")
