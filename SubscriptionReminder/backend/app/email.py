@@ -35,7 +35,7 @@ def send_verification_email(to_email, token):
         sg.send(message)
         print("✅ Verification email sent.")
     except Exception as e:
-        print("❌ Failed to send email:", str(e)
+        print("❌ Failed to send email:", str(e))
 
 
 
