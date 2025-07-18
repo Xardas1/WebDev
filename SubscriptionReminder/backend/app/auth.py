@@ -196,7 +196,16 @@ def verify_email(token: str, db: Session = Depends(get_db)):
     
 
         response = RedirectResponse(url="https://app.re-mind.xyz/product")
-
+        access_token = create_access_token(data={"sub": user.email})
+        response.set_cookie(
+        key="token",
+        value=access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        domain=".re-mind.xyz",
+        max_age=60 * 60 * 24,
+        )
         return response
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=400, detail="Verification link expired")
