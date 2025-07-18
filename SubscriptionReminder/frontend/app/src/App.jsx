@@ -1,6 +1,6 @@
 // src/App.jsx  (app sub-domain)
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 import Navbar        from "./components/Navbar";
@@ -30,6 +30,7 @@ const App = () => {
         <Route path="/product"        element={<PrivateRoute><Product /></PrivateRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-email" element={<Navigate to="/product" /> } /> 
       </Routes>
     </>
   );
