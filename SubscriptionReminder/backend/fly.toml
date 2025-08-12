@@ -1,4 +1,4 @@
-app = "ReMind" # Change to your Fly.io app name
+app = "remind" # Change to your Fly.io app name
 
 [env]
   PORT = "8080"
