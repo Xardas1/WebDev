@@ -40,57 +40,55 @@ router = APIRouter()
 # ──────────────────────────────────────────────────────────────────────────────
 
 def verify_password(plain, hashed):
-    return pwd_context.verify(plain, hashed)
+    return pwd_context.verify(plain, hashed)  # Ta funkcja sprawdza, czy hasło, które wpisujemy w przeglądarce jest takie samo, jak zachaszowane w databasie.
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    return pwd_context.hash(password) # Ta funkcja hashuję hasło
 
-def get_user(db: Session, username: str):
-    return db.query(models.User).filter(models.User.email == username).first()
+def get_user(db: Session, email: str):
+    return db.query(models.User).filter(models.User.email == email).first()         # Ta funkcja patrzy w databasie i szuka pierwszej tabelki, gdzie podany string jest taki sam jak adres email, po czym zwraca usera z tej tabelki
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user(db, username)
+def authenticate_user(db: Session, email : str, password: str):                   # Ta funkcja sprawdza usera                  
+    user = get_user(db, email)                                                   # Na początku szuka pierwszej tabelki w databasie, gdzie podany email jest taki sam jak email w databasie, następnie przypisuję usera z tego database do zmiennej ,,user" 
     print("User found:", user)
     if not user:
-        return False
+        return False                                                                    # Jeżeli user nie istnieję i adres nie istnieję zwraca false 
     print("Password check:", verify_password(password, user.hashed_password))
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
+    if not verify_password(password, user.hashed_password):                                         
+        return False                                                                    # Jeżeli hasło nie jest takie same jak zhaszowane wcześniej, zwraca false
+    return user                                                                         # Jeżeli wszystko się zgadza user istnieje i hasło z wcześniej jest takie samo zwraca usera. 
 
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+def create_access_token(data: dict, expires_delta: timedelta | None = None):            # Ta funkcja tworzy token JWT
+    to_encode = data.copy()                                                             # Ta linijka tworzy kopię danych, które chcemy zakodować, nie używamy orginału ponieważ wtedy w dalszych krokach zmienialibyśmy orginalne dane
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))      # Ta linijka mówi, kiedy token powinien wygasnąć.
+    to_encode.update({"exp": expire})                                                   # Dodaję do tokenu część ,,exp", mówi to dekoderowi, kiedy token powinien wygasnąć
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)                       # Zwraca zakodowany token jwt, zakodowany przy pomocy secret key oraz algorytmu HS256
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Dependencies
 # ──────────────────────────────────────────────────────────────────────────────
 
-async def get_current_user(
-    request: Request,
-    token: str = Cookie(None),
-    db: Session = Depends(get_db),
+async def get_current_user(      # ta funkcja pozwala na to by, jakby każdemu userowi przypisywały się rzeczy jakich on potrzebuję.
+    token: str = Cookie(None),   # jako pierwszy argument dajemy zakodowany token JWT w postaci ciasteczka, jeżeli on nie istnieję jest przypisywany None
+    db: Session = Depends(get_db), # drugi argument mówi o tym, że db będzie posiadało zwróconą wartość funkcji get_db.
 ):
     if token is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated")                        # jeżeli token nie istnieje i server http ci go nie wysłał zwracamy error'a
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])         # dekoduję payload czyli token JWT zakodowany w ciasteczku z HTTP jest tutaj dekodowany
+        username = payload.get("sub")                                           # payload to jest dictionary, przy pomocy payload.get("sub") wyjmujemy z niego część "sub", czyli w sumie dostajemy adres email.
+        if username is None:                                                    # jeżeli to nie istnieję i dostajemy None to wtedy zwraca się nam error
             raise HTTPException(status_code=401, detail="Invalid token")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = get_user(db, username)
-    if user is None:
-        raise HTTPException(status_code=401, detail="User not found")
+    user = get_user(db, username)                                               # Przy pomocy adresu email robimy ,,query" w databasie co sprawia, że dostajemy wszystkie dane 'user'
+    if user is None:                                                            
+        raise HTTPException(status_code=401, detail="User not found")    
     return user
 
-async def get_current_active_user(
+async def get_current_active_user(                                              # ta funkcja sprawdza, czy zalogowany użytkownik jest aktywny, jeżeli nie jest blokuję go
     current_user: Annotated[models.User, Depends(get_current_user)]
 ):
     if not current_user.is_active:
