@@ -21,6 +21,7 @@ origins = [
     "https://www.re-mind.xyz",
     "https://re-mind.xyz",                # optional, fallback base domain
     "http://localhost:3000",             # local dev
+    "https://marketing-git-main-john-f-kennedys-projects-e8f88eee.vercel.app/",
     "http://127.0.0.1:3000"
 ]
 
