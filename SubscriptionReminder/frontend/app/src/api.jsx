@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://api.re-mind.xyz/',
+  baseURL: 'https://remind.fly.dev',
   withCredentials: true, // ✅ Send cookies automatically
 });
 

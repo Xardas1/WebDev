@@ -101,43 +101,43 @@ async def get_current_active_user(                                              
 
 @router.post("/token")
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(get_db),
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],                 # FastApi automatycznie analizuje pola formularza logowania i ,,login fields" 
+    db: Session = Depends(get_db),                                              # Ta część używa ,,dependency function" ,,get_db" by zdobyć database session.
 ) -> Token:
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
+    user = authenticate_user(db, form_data.username, form_data.password)        # Wywołujemy funkcję ,,authenticate_user", która szuka użytkownika poprzez email, weryfikuję hasło, zwraca użytkownika jeżeli jest ,,valid" lub False jeżel nie jest 
+    if not user:                                                                # Jeżeli user został nie znaleziony FastApi zwróci tą część jako JSON error response. 
         raise HTTPException(
             status_code=401,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
+    access_token = create_access_token(                                        # jeżeli logowanie powiodło się pomyślnie, tworzymy token JWT, w środku tego tokenu dodajemy ,,sub: user.email", później ten token będzie używany by zidentyfikować user'a.
         data={"sub": user.email},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
-    response = JSONResponse(content={"message": "Login successful"})
-    response.set_cookie(
+    response = JSONResponse(content={"message": "Login successful"})           # tutaj buduję się ,,response object", który wysyłamy z powrotem do frontendu
+    response.set_cookie(                                                       # ustawiamy token JWT jako ciasteczko
         key="token",
         value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="lax",
-        domain=".re-mind.xyz",
-        max_age=60 * 60 * 24,
+        httponly=True,                                                         # java script w frontendzie nie ma do tego dostępu (for security)
+        secure=True,                                                           # wysyłaj tylko po HTTPS
+        samesite="lax",                                                        # Protect against CSRF
+        domain=".re-mind.xyz",                                                 # Ciasteczko jest walidne tylko dla twojej domeny.
+        max_age=60 * 60 * 24,                                                  # Ciasteczko trwa jeden dzień
     )
     return response
 
-@router.post("/logout")
-def logout_user():
-    response = JSONResponse(content={"message": "Logged out"})
-    response.delete_cookie("token", domain=".re-mind.xyz")
-    return response
+@router.post("/logout")                                                        # to towrzy POST API endpoint na /logout                                         
+def logout_user():                                                             # standardowa funkcja nie asynchroniczna, nie potrzeba żadnych parametrów ponieważ nie ma znaczenia kto się wylogowywyję chcemy tylko zclearować token.
+    response = JSONResponse(content={"message": "Logged out"})                 # tworzymy odpowiedź, która wyśle to z powrotem do front'endu.
+    response.delete_cookie("token", domain=".re-mind.xyz")                     # usuwa ciasteczko o nazwie ,,token" co sprawia, że user zostaję wylogowany.
+    return response                                                            # zwraca odpowiedź z powrotem do klienta, ciasteczko przestało istnieć i user 
 
-@router.get("/users/me/", response_model=UserOut)
+@router.get("/users/me/", response_model=UserOut)                              # to tworzy ,,get route" na /users/me, w momencie gdy frontend wysyła GET request to /users/me ta funkcja się uruchamia
 async def read_users_me(
-    current_user: Annotated[models.User, Depends(get_current_active_user)]
+    current_user: Annotated[models.User, Depends(get_current_active_user)]     # to mówi ,,przed uruchomieniem tej funkcji, uruchom funkcję ,,get_current_active_user()", następnie weź ,,returned user" i przydziel go do ,,current user" 
 ):
     return current_user
 
@@ -146,30 +146,33 @@ async def read_users_me(
 # ──────────────────────────────────────────────────────────────────────────────
 
 @router.post("/register", response_model=UserOut)
-async def register_endpoint(registred_user: UserCreate, db: Session = Depends(get_db)):
+async def register_endpoint(
+    registred_user: UserCreate,             # jako argument bierze typ ,,UserCreate" 
+    db: Session = Depends(get_db)           # live connection to database 
+):
     # Username + Email uniqueness
     print("Register payload:", registred_user)
-    if db.query(User).filter(User.username == registred_user.username).first():
-        raise HTTPException(status_code=400, detail="Username already exists")
-    if db.query(User).filter(User.email == registred_user.email).first():
-        raise HTTPException(status_code=400, detail="Email already exists")
+    if db.query(User).filter(User.username == registred_user.username).first():                   # sprawdzamy czy username już istnieję, jeżeli tak : 
+        raise HTTPException(status_code=400, detail="Username already exists")                    # zwracamy error
+    if db.query(User).filter(User.email == registred_user.email).first():                         # sprawdzamy czy email istnieję, jeżeli tak : 
+        raise HTTPException(status_code=400, detail="Email already exists")                       # podnosimy error 
 
     # Create user
-    hashed_pw = get_password_hash(registred_user.password)
-    db_user = User(
-        username=registred_user.username,
-        email=registred_user.email,
-        hashed_password=hashed_pw,
-        is_active=True,
-        is_verified=False,
+    hashed_pw = get_password_hash(registred_user.password)                                        # instant hashujemy hasło.
+    db_user = User(                                                                               # tutaj tworzymy nowy ,,user" object
+        username=registred_user.username,                                                         # Podany username przypisujemy
+        email=registred_user.email,                                                               # Podany email przypisujemy
+        hashed_password=hashed_pw,                                                                # podane zhaszowane hasło przypisujemy
+        is_active=True,                                                                           # is_active --> user ma prawo korzystać ze strony
+        is_verified=False,                                                                        # nie jest zweryfikowany jeszcze
     )
 
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    db.add(db_user)                                                                               # dodajemy usera do ,,current db session"
+    db.commit()                                                                                   # faktycznie zapisujemy to w bazie danych
+    db.refresh(db_user)                                                                           # reloadujemy usera, z auto-wygenerowanym id value
 
     # Optional: email verification
-    verification_token = create_access_token(
+    verification_token = create_access_token(                                                     # 
         data={"sub": db_user.email},
         expires_delta=timedelta(minutes=30),
     )
