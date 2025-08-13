@@ -172,32 +172,32 @@ async def register_endpoint(
     db.refresh(db_user)                                                                           # reloadujemy usera, z auto-wygenerowanym id value
 
     # Optional: email verification
-    verification_token = create_access_token(                                                     # 
+    verification_token = create_access_token(                                                     # ta część tworzy ,,short-lived token JWT", który przechowuję email użytkownika ,,sub" 
         data={"sub": db_user.email},
         expires_delta=timedelta(minutes=30),
     )
-    send_verification_email(db_user.email, verification_token)
+    send_verification_email(db_user.email, verification_token)                                    # ta funkcja wysyła ,,verification_token", który zostal stworzony powyżej.
 
     return db_user
 
 @router.get("/verify-email")
-def verify_email(token: str, db: Session = Depends(get_db)):
+def verify_email(token: str, db: Session = Depends(get_db)):                                      # jako parametr bierze token z ,,query parameter" , nastomiast db : Session znaczy, że podłączamy ,,live connection to database" 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])                           # ta linijka deokduję token JWT używając ,,SECRET_KEY", sprawdza czy jest prawidłowy i nie został zmodyfikowany.
+        email = payload.get("sub")                                                                # payload to jest dictionary, robiąc ,,paygload.get("sub"), wyjmujemy z niego część ,,sub"
         if not email:
             raise HTTPException(status_code=400, detail="Invalid token")
 
-        user = db.query(User).filter(User.email == email).first()
+        user = db.query(User).filter(User.email == email).first()                                 # szuka usera w databasie, przy pomocy emailu z tokena.
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=404, detail="User not found")                         # jeżeli user nie istnieję ,,raiseujemy" eror 404 
 
-        user.is_verified = True
-        db.commit()
+        user.is_verified = True                                                                   # markujemy usera, że jest zweryfikowany jako ,,True" 
+        db.commit()                                                                               # zapisujemy zmiany w bazie danych
     
 
-        response = RedirectResponse(url="https://app.re-mind.xyz/product")
-        access_token = create_access_token(data={"sub": user.email})
+        response = RedirectResponse(url="https://app.re-mind.xyz/product")                        # Po pomyślnej weryfikacji przekierowujemy użytkownika do interfejsu aplikacji
+        access_token = create_access_token(data={"sub": user.email})                              # Automatycznie logujemy użytkownika, poprzez stworzenie tokenu JWT i ustawienie go jako ciasteczko. 
         response.set_cookie(
         key="token",
         value=access_token,
@@ -207,11 +207,11 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         domain=".re-mind.xyz",
         max_age=60 * 60 * 24,
         )
-        return response
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=400, detail="Verification link expired")
+        return response                                                                          # Wysyłamy odpowiedź z gotowym plikiem cookie do przekierowania. 
+    except jwt.ExpiredSignatureError:                                                            # Obsługujemy błędy w dwóch przypadkach, gdy : 
+        raise HTTPException(status_code=400, detail="Verification link expired")                 # Link do weryfikacji wygasł
     except Exception:
-        raise HTTPException(status_code=400, detail="Invalid verification link")
+        raise HTTPException(status_code=400, detail="Invalid verification link")                 # Link do wetyfikacji był ,,invalid" 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Forgot + Reset Password
@@ -221,19 +221,19 @@ class EmailRequest(BaseModel):
     email: EmailStr
 
 @router.post("/forgot-password")
-def forgot_password(request: EmailRequest):
-    mail = request.email
-    with SessionLocal() as db:
-        user = db.query(User).filter(User.email == mail).first()
+def forgot_password(request: EmailRequest):                             # Funckja jako argument bierze typ ,,Email Request" zdefiniowany powyżej
+    mail = request.email                                                # Extractujemy ,,email" string z request body, tzn. z tego dicta.
+    with SessionLocal() as db:                                          # Tworzymy nową sesję DB.
+        user = db.query(User).filter(User.email == mail).first()        # Ta część sprawdza czy ,,user" z tym emailem istnieje
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        token_data = {
-            "sub": user.email,
-            "exp": datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES),
+        token_data = {                                                  # Jeżeli user faktycznie istnieje, tworzymy dane dla ,,JWT reset token" 
+            "sub": user.email,                                          # "sub" --> subject --> Stores the email, 
+            "exp": datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES), # "exp" --> expiration time --> Znaczy że ten token będzie działał tylko przez określony czas
         }
-        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-        send_password_reset_email(user.email, token)
+        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM) # Ta część tworzy token JWT z danych używając do tego ,,secret key" 
+        send_password_reset_email(user.email, token) # wołamy customową ,,send email function", który wysyła nam link do resetowania hasła.
         return {"message": "Reset email sent"}
 
 class ResetPasswordRequest(BaseModel):
@@ -241,22 +241,23 @@ class ResetPasswordRequest(BaseModel):
     new_password: str
 
 @router.post("/reset-password")
-def reset_password(data: ResetPasswordRequest):
+def reset_password(data: ResetPasswordRequest):             # Funkcja jako argument bierze typ ,,ResetPasswordRequest" zdefiniowany powyżej.
     try:
-        payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-        if not email:
-            raise HTTPException(status_code=400, detail="Invalid token")
+        payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])        # dekodujemy token JWT przy pomocy ,,secret key" 
+        email = payload.get("sub")                                                  # payload to dict, dlatego używamy ,,get", by wyciągnć ,,email"
+        if not email:                                                               # Jeżeli email jest niepoprawny albo wygasł:
+            raise HTTPException(status_code=400, detail="Invalid token")            # Raisujemy error 
     except JWTError:
-        raise HTTPException(status_code=400, detail="Invalid or expired token")
+        raise HTTPException(status_code=400, detail="Invalid or expired token")     
 
     with SessionLocal() as db:
-        user = db.query(User).filter(User.email == email).first()
+        user = db.query(User).filter(User.email == email).first()                   # To tworzy sesję i próbuję znaleźć usera poprzez podany email
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=404, detail="User not found")           # jeżeli user nie zostanie znaleziony zwracamy ,,error" 
 
-        hashed = get_password_hash(data.new_password)
-        user.hashed_password = hashed
-        db.commit()
+                                                                                    # jeżeli user został znaleziony to : 
+        hashed = get_password_hash(data.new_password)                               # hashujemy hasło przy pomocy bcrypt'a 
+        user.hashed_password = hashed                                               # zastępujemy stare hasło nowym 
+        db.commit()                                                                 # zapisujemy wszystko do bazy danych. 
 
-    return {"message": "Password reset successful"}
+    return {"message": "Password reset successful"}                                 # wysyłamy wiadomosć do frontendu, że reset hasła przebiegł poprawnie 
