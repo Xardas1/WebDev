@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
@@ -12,7 +12,6 @@ const Navbar = () => {
     { href: 'https://app.re-mind.xyz/product', label: 'Demo' },
   ];
 
-  
   return (
     <nav className="bg-transparent text-black top-0 z-50 text-base w-full">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
