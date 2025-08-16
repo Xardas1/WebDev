@@ -5,7 +5,7 @@ import { useAuth } from '../../../app/src/context/AuthContext'; // ✅ use corre
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, loading, fetchUser } = useAuth();
+  const { user, logout, loading} = useAuth();
 
   const navLinks = [
     { href: 'https://www.re-mind.xyz/home', label: 'Home' },
