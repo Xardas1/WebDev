@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../app/src/context/AuthContext'; // ✅ use correct path
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
