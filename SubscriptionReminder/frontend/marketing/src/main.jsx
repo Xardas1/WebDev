@@ -9,9 +9,9 @@ import '@fontsource/inter';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider.Provider value={{ user, login, logout, loading, fetchUser }} >
+      <AuthProvider>
         <App />
-      </AuthProvider.Provider>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
