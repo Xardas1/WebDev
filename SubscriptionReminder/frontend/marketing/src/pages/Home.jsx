@@ -61,12 +61,18 @@ const Home = () => {
                   <p>Loading: {loading ? "Yes" : "No"}</p>
                   <p>User: {user ? `Logged in as ${user.username}` : "Not logged in"}</p>
                   <p>Current domain: {window.location.hostname}</p>
+                  <p>All cookies: {document.cookie || "No cookies found"}</p>
                   <button 
                     onClick={() => {
                       console.log("🧪 Test button clicked");
                       console.log("🔍 Current cookies:", document.cookie);
                       console.log("🔍 User state:", user);
                       console.log("🔍 Loading state:", loading);
+                      console.log("🔍 Current domain:", window.location.hostname);
+                      
+                      // Test if we can access cookies from different domains
+                      console.log("🔍 Cookies for .re-mind.xyz:", document.cookie.split(';').filter(c => c.includes('token')));
+                      console.log("🔍 Cookies for current domain:", document.cookie.split(';').filter(c => c.includes('token')));
                     }}
                     className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs"
                   >
