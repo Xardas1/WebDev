@@ -5,7 +5,32 @@ import { useAuth } from '../context/AuthContext'; // ✅ Import useAuth
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); // ✅ Access auth context
+  const { user, logout, loading } = useAuth(); // ✅ Access auth context
+
+  // Smart navigation functions
+  const handleLogin = () => {
+    if (loading) return; // Don't navigate while loading
+    
+    if (user) {
+      // User is logged in, go to product page
+      window.location.href = "/product";
+    } else {
+      // User is not logged in, go to login page
+      window.location.href = "/login";
+    }
+  };
+
+  const handleSignUp = () => {
+    if (loading) return; // Don't navigate while loading
+    
+    if (user) {
+      // User is logged in, go to product page
+      window.location.href = "/product";
+    } else {
+      // User is not logged in, go to signup page
+      window.location.href = "/signup";
+    }
+  };
 
     const navLinks = [
     { href: 'https://www.re-mind.xyz/home', label: 'Home' },
@@ -52,19 +77,19 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <a
-                href="https://www.re-mind.xyz/login"
+              <button
+                onClick={handleLogin}
                 className="font-semibold text-sm border border-gray-300 rounded-md px-4 py-2 text-gray-800 hover:bg-gray-200 transition cursor-pointer"
               >
                 Login
-              </a>
+              </button>
 
-              <a
-                href="https://app.re-mind.xyz/signup"
+              <button
+                onClick={handleSignUp}
                 className="font-semibold text-sm rounded-md px-4 py-2 bg-gray-900 text-white hover:bg-gray-700 transition cursor-pointer"
               >
                 Sign up
-              </a>
+              </button>
             </>
           )}
         </div>

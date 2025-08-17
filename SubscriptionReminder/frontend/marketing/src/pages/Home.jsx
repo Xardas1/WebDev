@@ -6,9 +6,25 @@ import { CircleCheck } from 'lucide-react';
 import { Clover } from 'lucide-react';
 import { Rocket } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  // Smart navigation function
+  const handleTryItFree = () => {
+    if (loading) return; // Don't navigate while loading
+    
+    if (user) {
+      // User is logged in, go to product page
+      window.location.href = "https://app.re-mind.xyz/product";
+    } else {
+      // User is not logged in, go to login page
+      window.location.href = "https://app.re-mind.xyz/login";
+    }
+  };
+
   // bg-gradient-to-br from-[#fdfcf9] to-[#f6f3ef] option 1
   // bg-gradient-to-br from-[#f5f7fa] to-[#e4e7eb]
   return (
@@ -33,12 +49,12 @@ const Home = () => {
                 
 
                   <div className="">
-                    <a
-                      href="https://app.re-mind.xyz/signup"
+                    <button
+                      onClick={handleTryItFree}
                       className="bg-black text-white px-8 py-3 mb-5 rounded-lg hover:bg-neutral-800 active:scale-95 transition-transform shadow-md font-semibold tracking-wide text-base cursor-pointer"
                     >
                       Try it free
-                    </a>
+                    </button>
                   </div>
                   </div>
 
@@ -50,13 +66,13 @@ const Home = () => {
                   <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
                     <div className="text-purple-600 text-3xl mb-4">🔔</div>
                     <h3 className="text-lg font-semibold mb-2">Stop forgetting subscriptions</h3>
-                    <p className="text-gray-600 font-['Inter']">Never forget a subscription again. Stop wasting money on services you don’t use.</p>
+                    <p className="text-gray-600 font-['Inter']">Never forget a subscription again. Stop wasting money on services you don't use.</p>
                   </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
                   <div className="text-purple-600 text-3xl mb-4">💸</div> 
                   <h3 className="text-lg font-semibold mb-2">Safe money monthly</h3>
-                  <p className="text-gray-600 font-['Inter']">Save money every month — up to $5,000 over your lifetime. Don’t pay for what you don’t need.</p>
+                  <p className="text-gray-600 font-['Inter']">Save money every month — up to $5,000 over your lifetime. Don't pay for what you don't need.</p>
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
@@ -78,12 +94,12 @@ const Home = () => {
                 </div>
 
               <div className="text-center mb-6 mt-6">
-                  <a
-                    href="https://app.re-mind.xyz/signup"
+                  <button
+                    onClick={handleTryItFree}
                     className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md fong-semibold tracking-wide text-base cursor-pointer"
                   >
                     Try It Free
-                  </a>
+                  </button>
               </div>
 
 
@@ -154,12 +170,12 @@ const Home = () => {
                   <h1 className="text-3xl font-['Poppins] mt-5"> Sign Up Now And Never Waste Your Money Again</h1>
                   <p className="mt-4 text-xl mb-8 "> Stop wasting money on things you don't use, click here to try it for free no hidden costs</p>
 
-                  <a
-                    href="https://app.re-mind.xyz/signup"
+                  <button
+                    onClick={handleTryItFree}
                     className="bg-black text-white px-8 py-3 rounded-lg hover:bg-neutral-800 transition shadow-md fong-semibold tracking-wide text-base mt-7 cursor-pointer"
                   >
                     Try It Free
-                  </a>
+                  </button>
 
                   </div>
               </div>    

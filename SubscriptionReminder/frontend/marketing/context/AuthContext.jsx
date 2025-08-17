@@ -23,8 +23,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async () => {
-    await fetchUser(); // ✅ ensure it’s awaited
-    window.location.href = "https://www.re-mind.xyz/home";
+    await fetchUser(); // ✅ ensure it's awaited
+    // ✅ Redirect to product page instead of marketing home
+    window.location.href = "https://app.re-mind.xyz/product";
   };
 
   const logout = async () => {

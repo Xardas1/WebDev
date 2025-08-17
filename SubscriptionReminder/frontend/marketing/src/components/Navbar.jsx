@@ -7,6 +7,19 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, loading} = useAuth();
 
+  // Smart navigation function
+  const handleSignUp = () => {
+    if (loading) return; // Don't navigate while loading
+    
+    if (user) {
+      // User is logged in, go to product page
+      window.location.href = "https://app.re-mind.xyz/product";
+    } else {
+      // User is not logged in, go to login page
+      window.location.href = "https://app.re-mind.xyz/login";
+    }
+  };
+
   const navLinks = [
     { href: 'https://www.re-mind.xyz/home', label: 'Home' },
     { href: 'https://app.re-mind.xyz/product', label: 'Demo' },
@@ -57,12 +70,12 @@ const Navbar = () => {
                 Login
               </a>
 
-              <a
-                href="https://app.re-mind.xyz/signup"
+              <button
+                onClick={handleSignUp}
                 className="font-semibold text-sm rounded-md px-4 py-2 bg-gray-900 text-white hover:bg-gray-700 transition cursor-pointer"
               >
                 Sign up
-              </a>
+              </button>
             </>
           )}
         </div>
