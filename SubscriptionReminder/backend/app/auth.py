@@ -231,19 +231,40 @@ class EmailRequest(BaseModel):
 
 @router.post("/forgot-password")
 def forgot_password(request: EmailRequest):                             # Funckja jako argument bierze typ ,,Email Request" zdefiniowany powyżej
-    mail = request.email                                                # Extractujemy ,,email" string z request body, tzn. z tego dicta.
-    with SessionLocal() as db:                                          # Tworzymy nową sesję DB.
-        user = db.query(User).filter(User.email == mail).first()        # Ta część sprawdza czy ,,user" z tym emailem istnieje
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+    try:
+        mail = request.email                                                # Extractujemy ,,email" string z request body, tzn. z tego dicta.
+        print(f"🔄 Password reset requested for email: {mail}")
+        
+        with SessionLocal() as db:                                          # Tworzymy nową sesję DB.
+            user = db.query(User).filter(User.email == mail).first()        # Ta część sprawdza czy ,,user" z tym emailem istnieje
+            if not user:
+                print(f"❌ Password reset failed: User not found for email {mail}")
+                raise HTTPException(status_code=404, detail="User not found")
 
-        token_data = {                                                  # Jeżeli user faktycznie istnieje, tworzymy dane dla ,,JWT reset token" 
-            "sub": user.email,                                          # "sub" --> subject --> Stores the email, 
-            "exp": datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES), # "exp" --> expiration time --> Znaczy że ten token będzie działał tylko przez określony czas
-        }
-        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM) # Ta część tworzy token JWT z danych używając do tego ,,secret key" 
-        send_password_reset_email(user.email, token) # wołamy customową ,,send email function", który wysyła nam link do resetowania hasła.
-        return {"message": "Reset email sent"}
+            print(f"✅ User found for password reset: {user.username}")
+
+            token_data = {                                                  # Jeżeli user faktycznie istnieje, tworzymy dane dla ,,JWT reset token" 
+                "sub": user.email,                                          # "sub" --> subject --> Stores the email, 
+                "exp": datetime.utcnow() + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES), # "exp" --> expiration time --> Znaczy że ten token będzie działał tylko przez określony czas
+            }
+            token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM) # Ta część tworzy token JWT z danych używając do tego ,,secret key" 
+            
+            print(f"📧 Sending password reset email to {user.email}")
+            success = send_password_reset_email(user.email, token) # wołamy customową ,,send email function", który wysyła nam link do resetowania hasła.
+            
+            if success:
+                print(f"✅ Password reset email sent successfully to {user.email}")
+                return {"message": "Reset email sent"}
+            else:
+                print(f"❌ Failed to send password reset email to {user.email}")
+                raise HTTPException(status_code=500, detail="Failed to send reset email")
+                
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        print(f"❌ Unexpected error in forgot_password: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 class ResetPasswordRequest(BaseModel):
     token: str

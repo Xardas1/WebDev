@@ -104,18 +104,100 @@ def reset_db():
     Base.metadata.create_all(bind=engine)
     return {"message": "Database reset successfully!"}
 
+# ✅ Test email functionality
+@app.post("/test-email/")
+def test_email():
+    """Test endpoint to check if email system is working"""
+    try:
+        from .email import send_reminder_email
+        
+        # Check if SendGrid is configured
+        import os
+        sendgrid_key = os.getenv("SENDGRID_API_KEY")
+        
+        if not sendgrid_key:
+            return {
+                "status": "error",
+                "message": "SendGrid API key not configured",
+                "details": "Please set SENDGRID_API_KEY in your environment variables"
+            }
+        
+        # Try to send a test email
+        success = send_reminder_email(
+            to_email="test@example.com",  # This won't actually send, just tests the configuration
+            sub_name="Test Subscription",
+            deadline="2025-01-01"
+        )
+        
+        if success:
+            return {
+                "status": "success",
+                "message": "Email system is working properly",
+                "details": "SendGrid configuration is correct"
+            }
+        else:
+            return {
+                "status": "error",
+                "message": "Email system failed",
+                "details": "Check SendGrid configuration and logs"
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": "Email system error",
+            "details": str(e)
+        }
+
 # ✅ Background job to check upcoming deadlines
 def check_upcoming_deadlines():
-    with SessionLocal() as db:
-        today = datetime.utcnow().date()
-        reminder_date = today + timedelta(days=3)
-        subs = db.query(Subscriptions).filter(Subscriptions.deadline == reminder_date).all()
-        for sub in subs:
-            user = db.query(User).filter(User.id == sub.user_id).first()
-            if user and user.is_verified:
-                send_reminder_email(user.email, sub.subscription_name, sub.deadline)
+    """Check for subscriptions due in 3 days and send reminder emails"""
+    try:
+        print("🔄 Checking for upcoming subscription deadlines...")
+        
+        with SessionLocal() as db:
+            today = datetime.utcnow().date()
+            reminder_date = today + timedelta(days=3)
+            
+            print(f"📅 Looking for subscriptions due on: {reminder_date}")
+            
+            # Find subscriptions due in 3 days
+            subs = db.query(Subscriptions).filter(Subscriptions.deadline == reminder_date).all()
+            print(f"📧 Found {len(subs)} subscriptions due in 3 days")
+            
+            for sub in subs:
+                try:
+                    # Get user info
+                    user = db.query(User).filter(User.id == sub.user_id).first()
+                    if user and user.is_verified:
+                        print(f"📤 Sending reminder to {user.email} for subscription: {sub.subscription_name}")
+                        success = send_reminder_email(user.email, sub.subscription_name, sub.deadline)
+                        if success:
+                            print(f"✅ Reminder sent successfully to {user.email}")
+                        else:
+                            print(f"❌ Failed to send reminder to {user.email}")
+                    else:
+                        print(f"⚠️ User {sub.user_id} not found or not verified for subscription: {sub.subscription_name}")
+                except Exception as e:
+                    print(f"❌ Error processing subscription {sub.id}: {str(e)}")
+                    continue
+                    
+        print("✅ Finished checking upcoming deadlines")
+        
+    except Exception as e:
+        print(f"❌ Error in check_upcoming_deadlines: {str(e)}")
 
-# ✅ Start scheduler
-scheduler = BackgroundScheduler()
-scheduler.add_job(check_upcoming_deadlines, 'interval', days=1)
-scheduler.start()
+# ✅ Start scheduler with error handling
+try:
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        check_upcoming_deadlines, 
+        'interval', 
+        days=1,
+        id='subscription_reminders',
+        name='Check subscription deadlines daily'
+    )
+    scheduler.start()
+    print("✅ Scheduler started successfully for subscription reminders")
+except Exception as e:
+    print(f"❌ Failed to start scheduler: {str(e)}")
