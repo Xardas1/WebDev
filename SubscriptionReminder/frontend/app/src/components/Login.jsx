@@ -22,6 +22,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
 
     try {
       const params = new URLSearchParams();
@@ -37,10 +38,17 @@ export default function Login() {
       });
 
       // ✅ Now fetches user using the cookie
-      login(); // will call fetchUser() in context
+      await login(); // ✅ Make sure to await this
+      
+      // ✅ Navigate to product page after successful login
+      navigate('/product');
     } catch (error) {
       console.error('Login failed:', error);
-      setError('Login failed. Please check your credentials.');
+      if (error.response?.status === 401) {
+        setError('Invalid credentials. Please check your email and password.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     }
   };
 

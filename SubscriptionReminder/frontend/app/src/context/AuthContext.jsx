@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async () => {
     await fetchUser(); // ✅ ensure it’s awaited
-    window.location.href = "https://www.re-mind.xyz/home";
+    window.location.href = "/product";
   };
 
   const logout = async () => {

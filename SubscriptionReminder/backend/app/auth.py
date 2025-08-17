@@ -123,7 +123,7 @@ async def login_for_access_token(
         value=access_token,
         httponly=True,                                                         # java script w frontendzie nie ma do tego dostępu (for security)
         secure=True,                                                           # wysyłaj tylko po HTTPS
-        samesite="lax",                                                        # Protect against CSRF
+        samesite="none",                                                        # Protect against CSRF
         domain=".re-mind.xyz",                                                 # Ciasteczko jest walidne tylko dla twojej domeny.
         max_age=60 * 60 * 24,                                                  # Ciasteczko trwa jeden dzień
     )
@@ -203,7 +203,7 @@ def verify_email(token: str, db: Session = Depends(get_db)):                    
         value=access_token,
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="none",
         domain=".re-mind.xyz",
         max_age=60 * 60 * 24,
         )
