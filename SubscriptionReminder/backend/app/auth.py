@@ -204,7 +204,6 @@ def verify_email(token: str, db: Session = Depends(get_db)):                    
         httponly=True,
         secure=True,
         samesite="none",
-        domain=".re-mind.xyz",
         max_age=60 * 60 * 24,
         )
         return response                                                                          # Wysyłamy odpowiedź z gotowym plikiem cookie do przekierowania. 
