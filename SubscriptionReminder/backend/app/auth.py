@@ -131,8 +131,6 @@ async def login_for_access_token(
 
 @router.post("/logout")                                                        # to towrzy POST API endpoint na /logout                                         
 def logout_user():                                                             # standardowa funkcja nie asynchroniczna, nie potrzeba żadnych parametrów ponieważ nie ma znaczenia kto się wylogowywyję chcemy tylko zclearować token.
-    print("🔄 Logout endpoint called")  # Debug log
-    
     response = JSONResponse(content={"message": "Logged out"})                 # tworzymy odpowiedź, która wyśle to z powrotem do front'endu.
     
     # ✅ Delete cookie with proper parameters to ensure it's removed
@@ -144,7 +142,6 @@ def logout_user():                                                             #
         # domain=".re-mind.xyz",                                               # ❌ Remove this - let browser handle domain automatically
     )
     
-    print("🍪 Logout: Cookie 'token' deleted")  # Debug log
     return response                                                            # zwraca odpowiedź z powrotem do klienta, ciasteczko przestało istnieć i user 
 
 @router.get("/users/me/", response_model=UserOut)                              # to tworzy ,,get route" na /users/me, w momencie gdy frontend wysyła GET request to /users/me ta funkcja się uruchamia
