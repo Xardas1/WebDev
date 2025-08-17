@@ -6,7 +6,7 @@ import { CircleCheck } from 'lucide-react';
 import { Clover } from 'lucide-react';
 import { Rocket } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Home = () => {
   const navigate = useNavigate();
