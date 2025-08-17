@@ -14,12 +14,20 @@ const Home = () => {
 
   // Smart navigation function
   const handleTryItFree = () => {
-    if (loading) return; // Don't navigate while loading
+    console.log("🔄 Try it free clicked!");
+    console.log("📊 Auth state:", { user, loading });
+    
+    if (loading) {
+      console.log("⏳ Still loading, waiting...");
+      return; // Don't navigate while loading
+    }
     
     if (user) {
+      console.log("✅ User is logged in, going to product page");
       // User is logged in, go to product page
       window.location.href = "https://app.re-mind.xyz/product";
     } else {
+      console.log("❌ User is NOT logged in, going to login page");
       // User is not logged in, go to login page
       window.location.href = "https://app.re-mind.xyz/login";
     }
@@ -47,6 +55,24 @@ const Home = () => {
                       your subscriptions and never waste money again. With just few clicks you can stop 
                       wasting and enjoy your full pocket again.</p>
                 
+                {/* Debug info - remove this later */}
+                <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
+                  <p><strong>Debug Info:</strong></p>
+                  <p>Loading: {loading ? "Yes" : "No"}</p>
+                  <p>User: {user ? `Logged in as ${user.username}` : "Not logged in"}</p>
+                  <p>Current domain: {window.location.hostname}</p>
+                  <button 
+                    onClick={() => {
+                      console.log("🧪 Test button clicked");
+                      console.log("🔍 Current cookies:", document.cookie);
+                      console.log("🔍 User state:", user);
+                      console.log("🔍 Loading state:", loading);
+                    }}
+                    className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs"
+                  >
+                    Test Auth Status
+                  </button>
+                </div>
 
                   <div className="">
                     <button

@@ -23,18 +23,42 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async () => {
-    await fetchUser(); // ✅ ensure it’s awaited
+    await fetchUser(); // ✅ ensure it's awaited
     window.location.href = "/product";
   };
 
   const logout = async () => {
     try {
+      console.log("🔄 Logging out...");
+      
+      // Call backend logout endpoint
       await api.post("/logout", {}, { withCredentials: true });
-    } catch {
-      // silently ignore
+      console.log("✅ Backend logout successful");
+      
+      // Clear user state immediately
+      setUser(null);
+      console.log("✅ User state cleared");
+      
+      // Clear any local cookies manually (backup)
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.re-mind.xyz";
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      console.log("✅ Cookies cleared manually");
+      
+      // Redirect to home page
+      console.log("🔄 Redirecting to home...");
+      window.location.href = "https://www.re-mind.xyz/home";
+      
+    } catch (error) {
+      console.error("❌ Logout error:", error);
+      
+      // Even if backend fails, clear local state and cookies
+      setUser(null);
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.re-mind.xyz";
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      
+      // Still redirect
+      window.location.href = "https://www.re-mind.xyz/home";
     }
-    setUser(null);
-    window.location.href = "https://www.re-mind.xyz/home";
   };
 
   /* ------------- bootstrap ------------- */
