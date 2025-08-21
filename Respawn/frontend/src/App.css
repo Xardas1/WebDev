@@ -1,0 +1,236 @@
+/* Import pixel art font */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables */
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #1a1a2e;
+  --accent-green: #00ff88;
+  --accent-gold: #ffd700;
+  --accent-red: #ff4757;
+  --text-primary: #ffffff;
+  --text-secondary: #b8b8b8;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Typography */
+h1, h2, h3 {
+  font-family: 'Press Start 2P', monospace;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  background: linear-gradient(45deg, var(--accent-green), var(--accent-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--accent-gold);
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: var(--accent-green);
+}
+
+p {
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section {
+  padding: 5rem 0;
+  text-align: center;
+}
+
+.section:nth-child(even) {
+  background: var(--bg-secondary);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: linear-gradient(45deg, var(--accent-green), #3742fa);
+  border: 2px solid var(--accent-green);
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+/* Hero section */
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  margin-bottom: 2rem;
+}
+
+
+
+/* Fix for the gray background alignment */
+.section:nth-child(2) {
+  background: var(--bg-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.section:nth-child(2)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-secondary);
+  z-index: -1;
+}
+
+.section:nth-child(2) .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* UI Preview section */
+.ui-preview {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.placeholder-box {
+  background: var(--bg-secondary);
+  border: 3px dashed var(--accent-green);
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px var(--accent-green));
+  text-shadow: 2px 2px 0px var(--accent-green);
+}
+
+/* Signup form */
+.signup-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 2px solid var(--accent-green);
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+.form-input:focus {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.form-subtext {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Footer */
+.footer {
+  background: var(--bg-primary);
+  border-top: 2px solid var(--accent-green);
+  padding: 3rem 0;
+  margin-top: 2rem;
+}
+
+.footer .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+}
+
+.footer-link {
+  color: var(--accent-green);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--accent-gold);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .section {
+    padding: 3rem 0;
+  }
+  
+  .footer .container {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .footer-links {
+    gap: 1.5rem;
+  }
+}
